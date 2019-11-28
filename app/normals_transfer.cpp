@@ -5,15 +5,14 @@
  * 12/11/2019
  */
 
-#include "IO/readOBJ.h"
-#include "IO/readOFF.h"
-#include "IO/readPLY.h"
-#include "IO/writePLY.h"
-
 #include <Eigen/Dense>
 #include <vector>
 
+#include "IO/readPLY.h"
+#include "IO/writePLY.h"
 #include "EigenTools/nanoflannWrapper.hpp"
+
+
 
 int main(int argc, char* argv[])
 {
@@ -39,18 +38,19 @@ int main(int argc, char* argv[])
     std::cout << "Target file: " << target_path << "\n";
     std::cout << "Output file: " << output_path << "\n";
 
-    Eigen::MatrixXd source_V, target_V; // V: vertex of the surface
-    Eigen::MatrixXi source_UV, target_UV; // not used but required for IO
-    Eigen::MatrixXd source_N, target_N; // N: normal of the surface
-    Eigen::MatrixXi source_F, target_F; // F: faces of the surface (used for plots)
+    Eigen::MatrixXd source_V, target_V;     // V: vertex of the surface
+    Eigen::MatrixXi source_RGB, target_RGB; // not used but required for IO
+    Eigen::MatrixXd source_N, target_N;     // N: normal of the surface
+    Eigen::MatrixXi source_F, target_F;     // F: faces of the surface (used for plots)
 
-    igl::readPLY(source_path, source_V, source_F, source_N, source_UV);
-    igl::readPLY(target_path, target_V, target_F, target_N, target_UV);
+    readPLY(source_path, source_V, source_F, source_N, source_RGB);
+    readPLY(target_path, target_V, target_F, target_N, target_RGB);
 
     std::cout << "\nBefore normals transfer:\n";
     std::cout << "size of V: " << source_V.rows() << std::endl;
     std::cout << "size of F: " << source_F.rows() << std::endl;
     std::cout << "size of N: " << source_N.rows() << std::endl;
+    std::cout << "size of RGB: " << source_RGB.rows() << std::endl;
 
     source_N = source_V; // lazy initialization
     nanoflann_wrapper knn_search(target_V);
@@ -79,9 +79,10 @@ int main(int argc, char* argv[])
     std::cout << "size of V: " << source_V.rows() << std::endl;
     std::cout << "size of F: " << source_F.rows() << std::endl;
     std::cout << "size of N: " << source_N.rows() << std::endl;
+    std::cout << "size of RGB: " << source_RGB.rows() << std::endl;
     
     std::cout << "\nNormals transfered\n";
-    igl::writePLY(output_path, source_V, source_F, source_N, source_UV, false);
+    writePLY(output_path, source_V, source_F, source_N, source_RGB, false);
     std::cout << "File succesfully saved\n";
 
     return 0;
